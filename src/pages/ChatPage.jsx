@@ -323,7 +323,7 @@ const ChatPage = () => {
               <span>Chatbot Cerdas</span>
             </p>
             <p className="text-on-surface-variant text-[11px] mt-1.5 leading-relaxed font-semibold">
-              Pertanyaan domain dijawab lokal. Pertanyaan umum diteruskan ke Groq AI.
+              Pertanyaan domain dijawab lokal. Pertanyaan umum diteruskan ke SleepWell AI.
             </p>
           </div>
         </aside>
