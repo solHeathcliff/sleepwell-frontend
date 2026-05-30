@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
 import { Moon, Mail, Lock, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 const LoginPage = () => {
@@ -34,54 +33,48 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-surface">
       {/* Mini Header */}
-      <nav className="p-6">
+      <nav className="p-6 border-b border-outline-variant">
         <Link to="/" className="flex items-center gap-2 w-fit">
-          <Moon className="w-6 h-6 text-violet-400 fill-violet-400/20" />
-          <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-            SleepWell AI
+          <div className="p-2 bg-primary-container text-on-primary-container rounded-md">
+            <Moon className="w-5 h-5 stroke-[2px]" />
+          </div>
+          <span className="font-bold text-lg tracking-tight text-on-surface">
+            SleepWell
           </span>
         </Link>
       </nav>
 
       {/* Main Container */}
       <div className="flex-1 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white/[0.03] backdrop-blur-xl border border-white/5 shadow-2xl shadow-black/40 rounded-3xl p-8"
-        >
+        <div className="w-full max-w-md card">
           {/* Logo Center */}
           <div className="flex flex-col items-center mb-8">
-            <div className="p-3 bg-gradient-to-tr from-violet-600/20 to-blue-500/20 border border-violet-500/20 rounded-2xl mb-4">
-              <Moon className="w-8 h-8 text-violet-400 fill-violet-400/20" />
+            <div className="p-3 bg-primary-container text-on-primary-container rounded-md mb-4">
+              <Moon className="w-6 h-6 stroke-[2px]" />
             </div>
-            <h1 className="text-2xl font-extrabold text-white">Selamat Datang</h1>
-            <p className="text-sm text-slate-400 mt-1">Masuk ke akun SleepWell AI Anda</p>
+            <h1 className="text-[26px] font-bold text-on-surface">Selamat Datang</h1>
+            <p className="text-[15px] text-on-surface-variant mt-1">Masuk ke akun SleepWell Anda</p>
           </div>
 
           {/* Alert Error */}
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-start gap-2.5 p-4 mb-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm leading-relaxed"
-            >
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2.5 p-4 mb-6 rounded-md bg-error-container border border-error-container text-on-error-container text-[15px]">
+              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
               <span>{error}</span>
-            </motion.div>
+            </div>
           )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400" htmlFor="email">
+              <label className="label-sm text-on-surface-variant" htmlFor="email">
                 Email
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                  <Mail className="w-4 h-4" />
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                  <Mail className="w-5 h-5 stroke-[2px]" />
                 </span>
                 <input
                   id="email"
@@ -91,18 +84,18 @@ const LoginPage = () => {
                   placeholder="email@contoh.com"
                   required
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 bg-white/[0.04] hover:bg-white/[0.06] focus:bg-white/[0.06] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm font-medium outline-none transition-all focus:ring-4 focus:ring-violet-500/10"
+                  className="input-field pl-11"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400" htmlFor="password">
+              <label className="label-sm text-on-surface-variant" htmlFor="password">
                 Password
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                  <Lock className="w-4 h-4" />
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                  <Lock className="w-5 h-5 stroke-[2px]" />
                 </span>
                 <input
                   id="password"
@@ -112,47 +105,45 @@ const LoginPage = () => {
                   placeholder="Password Anda"
                   required
                   autoComplete="current-password"
-                  className="w-full pl-10 pr-4 py-3 bg-white/[0.04] hover:bg-white/[0.06] focus:bg-white/[0.06] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm font-medium outline-none transition-all focus:ring-4 focus:ring-violet-500/10"
+                  className="input-field pl-11"
                 />
               </div>
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold rounded-2xl shadow-xl shadow-violet-600/20 border border-violet-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full py-3 text-[15px]"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Memproses...</span>
                 </>
               ) : (
                 <>
                   <span>Masuk</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5 stroke-[2px]" />
                 </>
               )}
-            </motion.button>
+            </button>
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-6 text-slate-600 text-xs font-semibold tracking-wider">
-            <div className="flex-1 h-px bg-white/5" />
+          <div className="flex items-center my-6 text-on-surface-variant text-xs font-semibold tracking-wider">
+            <div className="flex-1 h-px bg-outline-variant" />
             <span className="px-4">atau</span>
-            <div className="flex-1 h-px bg-white/5" />
+            <div className="flex-1 h-px bg-outline-variant" />
           </div>
 
           {/* Footer Link */}
-          <div className="text-center text-sm text-slate-400">
+          <div className="text-center text-[15px] text-on-surface-variant">
             Belum punya akun?{' '}
-            <Link to="/register" className="text-violet-400 hover:text-violet-300 font-bold hover:underline">
+            <Link to="/register" className="text-primary font-bold hover:underline">
               Daftar gratis
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

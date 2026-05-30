@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Mail, Lock, User, AlertCircle, ArrowRight, ArrowLeft, Loader2, Award, Briefcase, Calendar } from 'lucide-react';
+import { Moon, Mail, Lock, User, AlertCircle, ArrowRight, ArrowLeft, Loader2, Award, Briefcase } from 'lucide-react';
 
 const RegisterPage = () => {
   const { register } = useAuth();
@@ -66,272 +65,242 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-surface">
       {/* Mini Header */}
-      <nav className="p-6">
+      <nav className="p-6 border-b border-outline-variant">
         <Link to="/" className="flex items-center gap-2 w-fit">
-          <Moon className="w-6 h-6 text-violet-400 fill-violet-400/20" />
-          <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-            SleepWell AI
+          <div className="p-2 bg-primary-container text-on-primary-container rounded-md">
+            <Moon className="w-5 h-5 stroke-[2px]" />
+          </div>
+          <span className="font-bold text-lg tracking-tight text-on-surface">
+            SleepWell
           </span>
         </Link>
       </nav>
 
       {/* Main Container */}
       <div className="flex-1 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg bg-white/[0.03] backdrop-blur-xl border border-white/5 shadow-2xl shadow-black/40 rounded-3xl p-8"
-        >
+        <div className="w-full max-w-lg card">
           {/* Logo Center */}
           <div className="flex flex-col items-center mb-6">
-            <div className="p-3 bg-gradient-to-tr from-violet-600/20 to-blue-500/20 border border-violet-500/20 rounded-2xl mb-4">
-              <Moon className="w-8 h-8 text-violet-400 fill-violet-400/20" />
+            <div className="p-3 bg-primary-container text-on-primary-container rounded-md mb-4">
+              <Moon className="w-6 h-6 stroke-[2px]" />
             </div>
-            <h1 className="text-2xl font-extrabold text-white">Buat Akun Baru</h1>
-            <p className="text-sm text-slate-400 mt-1">Lengkapi 2 langkah berikut untuk memulai</p>
+            <h1 className="text-[26px] font-bold text-on-surface">Buat Akun Baru</h1>
+            <p className="text-[15px] text-on-surface-variant mt-1">Lengkapi 2 langkah berikut untuk memulai</p>
           </div>
 
-          {/* Step Indicator dots */}
+          {/* Step Indicator */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${step === 1 ? 'bg-violet-500 ring-4 ring-violet-500/20 scale-125' : 'bg-green-500'}`} />
-            <div className="w-12 h-0.5 bg-white/10" />
-            <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${step === 2 ? 'bg-violet-500 ring-4 ring-violet-500/20 scale-125' : 'bg-white/10'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full transition-colors ${step === 1 ? 'bg-primary ring-4 ring-primary/20' : 'bg-primary'}`} />
+            <div className="w-12 h-[2px] bg-outline-variant" />
+            <div className={`w-2.5 h-2.5 rounded-full transition-colors ${step === 2 ? 'bg-primary ring-4 ring-primary/20' : 'bg-outline-variant'}`} />
           </div>
 
           {/* Notifications */}
           {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-start gap-2.5 p-4 mb-6 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm leading-relaxed"
-            >
-              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2.5 p-4 mb-6 rounded-md bg-error-container border border-error-container text-on-error-container text-[15px]">
+              <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
               <span>{error}</span>
-            </motion.div>
+            </div>
           )}
 
           {success && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-start gap-2.5 p-4 mb-6 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm leading-relaxed"
-            >
-              <Award className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2.5 p-4 mb-6 rounded-md bg-primary-container border border-primary-container text-on-primary-container text-[15px]">
+              <Award className="w-5 h-5 mt-0.5 flex-shrink-0" />
               <span>{success}</span>
-            </motion.div>
+            </div>
           )}
 
-          {/* Multi-step Forms */}
+          {/* Forms */}
           <form onSubmit={handleSubmit}>
-            <AnimatePresence mode="wait">
-              {step === 1 ? (
-                <motion.div
-                  key="step-1"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: 20, opacity: 0 }}
-                  className="space-y-5"
+            {step === 1 ? (
+              <div className="space-y-5">
+                <p className="label-sm text-on-surface-variant mb-2">Langkah 1/2 — Data Akun</p>
+
+                <div className="space-y-2">
+                  <label className="label-sm text-on-surface-variant" htmlFor="name">
+                    Nama Lengkap *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                      <User className="w-5 h-5 stroke-[2px]" />
+                    </span>
+                    <input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Masukkan nama Anda"
+                      required
+                      className="input-field pl-11"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="label-sm text-on-surface-variant" htmlFor="email">
+                    Email *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                      <Mail className="w-5 h-5 stroke-[2px]" />
+                    </span>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="email@contoh.com"
+                      required
+                      className="input-field pl-11"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="label-sm text-on-surface-variant" htmlFor="password">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                      <Lock className="w-5 h-5 stroke-[2px]" />
+                    </span>
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimal 6 karakter"
+                      required
+                      className="input-field pl-11"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="btn-primary w-full mt-6 py-3 text-[15px]"
                 >
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Langkah 1/2 — Data Akun</p>
+                  <span>Lanjutkan</span>
+                  <ArrowRight className="w-5 h-5 stroke-[2px]" />
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                <p className="label-sm text-on-surface-variant mb-2">Langkah 2/2 — Profil Konteks (Opsional)</p>
 
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-400" htmlFor="name">
-                      Nama Lengkap *
+                    <label className="label-sm text-on-surface-variant" htmlFor="age">
+                      Usia (tahun)
                     </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                        <User className="w-4 h-4" />
-                      </span>
-                      <input
-                        id="name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Masukkan nama Anda"
-                        required
-                        className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-violet-500/10"
-                      />
-                    </div>
+                    <input
+                      id="age"
+                      type="number"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      placeholder="25"
+                      min="1"
+                      max="120"
+                      className="input-field"
+                    />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-400" htmlFor="email">
-                      Email *
+                    <label className="label-sm text-on-surface-variant" htmlFor="weight">
+                      Berat (kg)
                     </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                        <Mail className="w-4 h-4" />
-                      </span>
-                      <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email@contoh.com"
-                        required
-                        className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-violet-500/10"
-                      />
-                    </div>
+                    <input
+                      id="weight"
+                      type="number"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      placeholder="65"
+                      min="20"
+                      max="300"
+                      step="0.1"
+                      className="input-field"
+                    />
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-400" htmlFor="password">
-                      Password *
-                    </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                        <Lock className="w-4 h-4" />
-                      </span>
-                      <input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Minimal 6 karakter"
-                        required
-                        className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all focus:ring-4 focus:ring-violet-500/10"
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <label className="label-sm text-on-surface-variant" htmlFor="occupation">
+                    Pekerjaan
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                      <Briefcase className="w-5 h-5 stroke-[2px]" />
+                    </span>
+                    <input
+                      id="occupation"
+                      type="text"
+                      value={occupation}
+                      onChange={(e) => setOccupation(e.target.value)}
+                      placeholder="Pelajar, Pekerja, dll"
+                      className="input-field pl-11"
+                    />
                   </div>
+                </div>
 
-                  <motion.button
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    type="button"
-                    onClick={handleNextStep}
-                    className="w-full py-3.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold rounded-2xl shadow-xl shadow-violet-600/20 border border-violet-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer mt-6"
+                <div className="space-y-2">
+                  <label className="label-sm text-on-surface-variant" htmlFor="gender">
+                    Jenis Kelamin
+                  </label>
+                  <select
+                    id="gender"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="input-field"
                   >
-                    <span>Lanjutkan</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="step-2"
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -20, opacity: 0 }}
-                  className="space-y-5"
-                >
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Langkah 2/2 — Profil Konteks (Opsional)
-                  </p>
+                    <option value="">Pilih (opsional)</option>
+                    <option value="male">Laki-laki</option>
+                    <option value="female">Perempuan</option>
+                    <option value="other">Lainnya</option>
+                  </select>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-400" htmlFor="age">
-                        Usia (tahun)
-                      </label>
-                      <input
-                        id="age"
-                        type="number"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
-                        placeholder="25"
-                        min="1"
-                        max="120"
-                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-slate-400" htmlFor="weight">
-                        Berat Badan (kg)
-                      </label>
-                      <input
-                        id="weight"
-                        type="number"
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                        placeholder="65"
-                        min="20"
-                        max="300"
-                        step="0.1"
-                        className="w-full px-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-400" htmlFor="occupation">
-                      Pekerjaan
-                    </label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                        <Briefcase className="w-4 h-4" />
-                      </span>
-                      <input
-                        id="occupation"
-                        type="text"
-                        value={occupation}
-                        onChange={(e) => setOccupation(e.target.value)}
-                        placeholder="Software Engineer, Pelajar, dll"
-                        className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-slate-400" htmlFor="gender">
-                      Jenis Kelamin
-                    </label>
-                    <select
-                      id="gender"
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-3 bg-[#111625] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-300 text-sm outline-none transition-all"
-                    >
-                      <option value="">Pilih (opsional)</option>
-                      <option value="male">Laki-laki</option>
-                      <option value="female">Perempuan</option>
-                      <option value="other">Lainnya</option>
-                    </select>
-                  </div>
-
-                  <div className="flex gap-4 mt-6">
-                    <button
-                      type="button"
-                      onClick={handlePrevStep}
-                      className="px-6 py-3.5 bg-white/5 hover:bg-white/10 text-slate-300 font-semibold rounded-2xl border border-white/5 transition-all flex items-center gap-1 cursor-pointer"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      <span>Kembali</span>
-                    </button>
-                    <motion.button
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      type="submit"
-                      disabled={loading}
-                      className="flex-1 py-3.5 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold rounded-2xl shadow-xl shadow-violet-600/20 border border-violet-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Mendaftar...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Buat Akun</span>
-                          <Award className="w-4 h-4" />
-                        </>
-                      )}
-                    </motion.button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                <div className="flex gap-4 mt-6">
+                  <button
+                    type="button"
+                    onClick={handlePrevStep}
+                    className="btn-secondary py-3 text-[15px]"
+                  >
+                    <ArrowLeft className="w-5 h-5 stroke-[2px]" />
+                    <span>Kembali</span>
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-primary flex-1 py-3 text-[15px]"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Mendaftar...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Buat Akun</span>
+                        <Award className="w-5 h-5 stroke-[2px]" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
           </form>
 
           {/* Footer Link */}
-          <div className="text-center text-sm text-slate-400 mt-6">
+          <div className="text-center text-[15px] text-on-surface-variant mt-6">
             Sudah punya akun?{' '}
-            <Link to="/login" className="text-violet-400 hover:text-violet-300 font-bold hover:underline">
+            <Link to="/login" className="text-primary font-bold hover:underline">
               Masuk di sini
             </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

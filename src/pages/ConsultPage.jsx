@@ -1,14 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Brain, FileText, Moon, Sparkles, MessageSquare, Activity,
-  ChevronRight, AlertCircle, ArrowLeft, Loader2,
-  CheckCircle2, AlertTriangle, Info, ShieldAlert, Footprints, Heart,
-  TrendingUp, Zap, Clock, Droplet
+  Brain, Moon, Sparkles, MessageSquare, Activity,
+  AlertCircle, ArrowLeft, Loader2,
+  AlertTriangle, Info, ShieldAlert, Footprints, Heart,
+  TrendingUp, Zap, Clock, Droplet, History
 } from 'lucide-react';
 import { API_BASE } from '../context/AuthContext';
 
@@ -32,6 +31,40 @@ const ConsultPage = () => {
   const [stressLevel, setStressLevel] = useState(savedInputs.stressLevel ?? 5);
   const [bmiCategory, setBmiCategory] = useState(savedInputs.bmiCategory ?? 'Normal');
   const [sleepDisorder, setSleepDisorder] = useState(savedInputs.sleepDisorder ?? 'None');
+
+  const [logs, setLogs] = useState([]);
+  const [selectedLogId, setSelectedLogId] = useState('manual');
+  
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const res = await axios.get(`${API_BASE}/sleep-logs?limit=10`);
+        setLogs(res.data.data.sleep_logs || []);
+      } catch (err) {
+        console.error("Gagal mengambil histori log:", err);
+      }
+    };
+    fetchLogs();
+  }, []);
+
+  const handleLogSelect = (e) => {
+    const logId = e.target.value;
+    setSelectedLogId(logId);
+    
+    if (logId === 'manual') return;
+    
+    const log = logs.find(l => l.id === logId);
+    if (log) {
+      setSleepDuration(log.sleep_duration);
+      setSleepQuality(log.sleep_quality);
+      setTotalSteps(log.total_steps || 0);
+      setVeryActiveMinutes(log.very_active_minutes || 0);
+      setPhysicalActivity(log.physical_activity || 0);
+      setStressLevel(log.stress_level);
+      setBmiCategory(log.bmi_category || 'Normal');
+      setSleepDisorder(log.sleep_disorder || 'None');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,13 +104,13 @@ const ConsultPage = () => {
   };
 
   const getScoreColorClass = (score) => {
-    if (score >= 65) return 'text-indigo-500';
-    if (score >= 45) return 'text-amber-500';
-    return 'text-red-500';
+    if (score >= 65) return 'text-primary';
+    if (score >= 45) return 'text-on-surface-variant';
+    return 'text-error';
   };
 
   const CircularProgress = ({ score, colorClass }) => {
-    const radius = 64;
+    const radius = 72;
     const stroke = 12;
     const normalizedRadius = radius - stroke * 2;
     const circumference = normalizedRadius * 2 * Math.PI;
@@ -87,7 +120,8 @@ const ConsultPage = () => {
       <div className="relative w-40 h-40 flex items-center justify-center">
         <svg height={radius * 2} width={radius * 2} className="transform -rotate-90">
           <circle
-            stroke="rgba(255,255,255,0.05)"
+            className="text-surface-container"
+            stroke="currentColor"
             fill="transparent"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -107,37 +141,39 @@ const ConsultPage = () => {
             cy={radius}
           />
         </svg>
-        <div className="absolute flex items-baseline">
-          <span className="text-5xl font-extrabold text-white tracking-tighter">{score ?? 0}</span>
-          <span className="text-xl font-bold text-slate-500 ml-1">%</span>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex items-baseline">
+            <span className="text-3xl sm:text-4xl font-bold text-on-surface tracking-tighter">{score ?? 0}</span>
+            <span className="text-sm sm:text-base font-bold text-on-surface-variant ml-0.5">%</span>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-surface">
       <Navbar />
 
       {/* Header */}
       <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-center">
         <Link 
           to="/dashboard" 
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-300 transition-colors mb-4"
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-on-surface-variant hover:text-primary transition-colors mb-4"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
+          <ArrowLeft className="w-3.5 h-3.5 stroke-[2px]" />
           <span>Kembali ke Dashboard</span>
         </Link>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Konsultasi Tidur</h1>
-        <p className="text-slate-400 text-sm mt-2 max-w-lg mx-auto">
+        <h1 className="text-[32px] font-bold text-on-surface">Konsultasi Tidur</h1>
+        <p className="text-on-surface-variant text-[15px] mt-2 max-w-lg mx-auto">
           Isi data tidur dan aktivitas harian Anda untuk mendapatkan prediksi kesehatan tidur esok hari dari AI.
         </p>
       </div>
 
       {error && (
         <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <div className="p-4 rounded-md bg-error-container border border-error-container text-on-error-container text-[15px] flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0 stroke-[2px]" />
             <span>{error}</span>
           </div>
         </div>
@@ -146,13 +182,39 @@ const ConsultPage = () => {
       {/* Form Cards */}
       <form onSubmit={handleSubmit} className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
+        {/* Data Source Selector
+        <div className="card border-primary/30">
+          <h3 className="text-[17px] font-bold text-on-surface mb-4 flex items-center gap-2">
+            <History className="w-5 h-5 text-primary stroke-[2px]" />
+            <span>Sumber Data Konsultasi</span>
+          </h3>
+          <div className="space-y-1.5">
+            <label className="label-sm text-on-surface-variant" htmlFor="log_selector">
+              Pilih Data (Opsional)
+            </label>
+            <select 
+              id="log_selector"
+              value={selectedLogId} 
+              onChange={handleLogSelect}
+              className="input-field"
+            >
+              <option value="manual">Isi Data Baru Secara Manual</option>
+              {logs.map(log => (
+                <option key={log.id} value={log.id}>
+                  Histori: {new Date(log.log_date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div> */}
+
         {/* Top Row: 2 cards side by side */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* ── Card 1: Sleep Core ── */}
-          <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6">
-            <h3 className="text-base font-bold text-slate-200 mb-5 flex items-center gap-2">
-              <Moon className="w-5 h-5 text-violet-400 fill-violet-400/20" />
+          <div className="card">
+            <h3 className="text-[17px] font-bold text-on-surface mb-5 flex items-center gap-2">
+              <Moon className="w-5 h-5 text-primary stroke-[2px]" />
               <span>Sleep Core</span>
             </h3>
 
@@ -160,19 +222,19 @@ const ConsultPage = () => {
               {/* Sleep Duration */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-slate-300" htmlFor="sleep_duration">
+                  <label className="label-sm text-on-surface-variant" htmlFor="sleep_duration">
                     Durasi Tidur
                   </label>
-                  <span className="text-sm font-bold text-violet-400">{sleepDuration}h</span>
+                  <span className="text-[15px] font-bold text-primary">{sleepDuration}h</span>
                 </div>
                 <input
                   id="sleep_duration"
                   type="range" min="0" max="14" step="0.5"
                   value={sleepDuration}
                   onChange={(e) => setSleepDuration(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-violet-500 focus:outline-none"
+                  className="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none"
                 />
-                <div className="flex justify-between text-[10px] text-slate-600 font-medium">
+                <div className="flex justify-between text-[11px] text-on-surface-variant font-semibold uppercase">
                   <span>0h</span><span>14h</span>
                 </div>
               </div>
@@ -180,41 +242,41 @@ const ConsultPage = () => {
               {/* Sleep Quality — Slider */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-semibold text-slate-300" htmlFor="sleep_quality">
+                  <label className="label-sm text-on-surface-variant" htmlFor="sleep_quality">
                     Kualitas Tidur
                   </label>
-                  <span className="text-sm font-bold text-violet-400">{sleepQuality}</span>
+                  <span className="text-[15px] font-bold text-primary">{sleepQuality}</span>
                 </div>
                 <input
                   id="sleep_quality"
                   type="range" min="1" max="10" step="1"
                   value={sleepQuality}
                   onChange={(e) => setSleepQuality(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-violet-500 focus:outline-none"
+                  className="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none"
                 />
-                <div className="flex justify-between text-[10px] text-slate-600 font-medium">
-                  <span>1 (Buruk)</span><span>10 (Sangat Baik)</span>
+                <div className="flex justify-between text-[11px] text-on-surface-variant font-semibold uppercase">
+                  <span>1 (Buruk)</span><span>10 (Baik)</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* ── Card 2: Aktivitas Harian ── */}
-          <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6">
-            <h3 className="text-base font-bold text-slate-200 mb-5 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-400" />
+          <div className="card">
+            <h3 className="text-[17px] font-bold text-on-surface mb-5 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary stroke-[2px]" />
               <span>Aktivitas Harian</span>
             </h3>
 
             <div className="space-y-4">
               {/* Total Steps */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="total_steps">
+                <label className="label-sm text-on-surface-variant" htmlFor="total_steps">
                   Total Langkah
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                    <Footprints className="w-4 h-4" />
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                    <Footprints className="w-5 h-5 stroke-[2px]" />
                   </span>
                   <input
                     id="total_steps" type="number"
@@ -222,19 +284,19 @@ const ConsultPage = () => {
                     onChange={(e) => setTotalSteps(e.target.value)}
                     placeholder="e.g. 8500"
                     min="0" max="100000" required
-                    className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
+                    className="input-field pl-11"
                   />
                 </div>
               </div>
 
               {/* Very Active Minutes */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="very_active_minutes">
-                  Total Aktivitas Intens
+                <label className="label-sm text-on-surface-variant" htmlFor="very_active_minutes">
+                  Aktivitas Intens (Menit)
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                    <Activity className="w-4 h-4" />
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                    <Activity className="w-5 h-5 stroke-[2px]" />
                   </span>
                   <input
                     id="very_active_minutes" type="number"
@@ -242,19 +304,19 @@ const ConsultPage = () => {
                     onChange={(e) => setVeryActiveMinutes(e.target.value)}
                     placeholder="e.g. 45"
                     min="0" max="600"
-                    className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
+                    className="input-field pl-11"
                   />
                 </div>
               </div>
 
               {/* Physical Activity Total */}
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="physical_activity">
-                  Total Menit Aktivitas Fisik
+                <label className="label-sm text-on-surface-variant" htmlFor="physical_activity">
+                  Aktivitas Fisik Total (Menit)
                 </label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
-                    <Heart className="w-4 h-4" />
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-on-surface-variant">
+                    <Heart className="w-5 h-5 stroke-[2px]" />
                   </span>
                   <input
                     id="physical_activity" type="number"
@@ -262,7 +324,7 @@ const ConsultPage = () => {
                     onChange={(e) => setPhysicalActivity(e.target.value)}
                     placeholder="e.g. 60"
                     min="0" max="1440" required
-                    className="w-full pl-10 pr-4 py-3 bg-white/[0.04] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-200 placeholder-slate-500 text-sm outline-none transition-all"
+                    className="input-field pl-11"
                   />
                 </div>
               </div>
@@ -271,9 +333,9 @@ const ConsultPage = () => {
         </div>
 
         {/* ── Card 3: Stress & Physiological Context (full width) ── */}
-        <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6">
-          <h3 className="text-base font-bold text-slate-200 mb-5 flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-amber-400" />
+        <div className="card">
+          <h3 className="text-[17px] font-bold text-on-surface mb-5 flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-secondary stroke-[2px]" />
             <span>Kondisi & Konteks Fisiologis</span>
           </h3>
 
@@ -281,19 +343,19 @@ const ConsultPage = () => {
             {/* Stress Level — Slider */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="stress_level">
+                <label className="label-sm text-on-surface-variant" htmlFor="stress_level">
                   Stress Level
                 </label>
-                <span className="text-sm font-bold text-violet-400">{stressLevel}</span>
+                <span className="text-[15px] font-bold text-primary">{stressLevel}</span>
               </div>
               <input
                 id="stress_level"
                 type="range" min="1" max="10" step="1"
                 value={stressLevel}
                 onChange={(e) => setStressLevel(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-white/5 rounded-lg appearance-none cursor-pointer accent-violet-500 focus:outline-none"
+                className="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none"
               />
-              <div className="flex justify-between text-[10px] text-slate-600 font-medium">
+              <div className="flex justify-between text-[11px] text-on-surface-variant font-semibold uppercase">
                 <span>1 (Tenang)</span><span>10 (Stres)</span>
               </div>
             </div>
@@ -301,14 +363,14 @@ const ConsultPage = () => {
             {/* BMI + Disorder row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="bmi_category">
+                <label className="label-sm text-on-surface-variant" htmlFor="bmi_category">
                   BMI Category
                 </label>
                 <select
                   id="bmi_category"
                   value={bmiCategory}
                   onChange={(e) => setBmiCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#111625] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-300 text-sm outline-none transition-all cursor-pointer"
+                  className="input-field"
                 >
                   <option value="Normal">Normal</option>
                   <option value="Underweight">Underweight</option>
@@ -318,14 +380,14 @@ const ConsultPage = () => {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-300" htmlFor="sleep_disorder">
+                <label className="label-sm text-on-surface-variant" htmlFor="sleep_disorder">
                   Diagnosed Sleep Disorder
                 </label>
                 <select
                   id="sleep_disorder"
                   value={sleepDisorder}
                   onChange={(e) => setSleepDisorder(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#111625] border border-white/5 focus:border-violet-500/50 rounded-2xl text-slate-300 text-sm outline-none transition-all cursor-pointer"
+                  className="input-field"
                 >
                   <option value="None">None</option>
                   <option value="Insomnia">Insomnia</option>
@@ -338,25 +400,23 @@ const ConsultPage = () => {
 
         {/* Submit Button */}
         <div className="flex justify-center pt-2">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <button
             type="submit"
             disabled={submitting}
-            className="px-12 py-4 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white font-bold rounded-2xl shadow-xl shadow-violet-600/25 border border-violet-500/25 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 text-base"
+            className="btn-primary px-12 py-4 text-[17px]"
           >
             {submitting ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin stroke-[2px]" />
                 <span>Menganalisis...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="w-5 h-5 stroke-[2px]" />
                 <span>Prediksi Esok Hari</span>
               </>
             )}
-          </motion.button>
+          </button>
         </div>
       </form>
 
@@ -364,125 +424,116 @@ const ConsultPage = () => {
       {/* Result Section — appears below after prediction   */}
       {/* ══════════════════════════════════════════════════ */}
       <div ref={resultRef} className="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <AnimatePresence mode="wait">
-          {result && (
-            <motion.div
-              key="result-section"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="mt-12"
-            >
-              {/* Header Title */}
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-extrabold text-white tracking-tight">Hasil Prediksi Esok Hari</h2>
-                <p className="text-slate-400 mt-3 max-w-xl mx-auto leading-relaxed text-sm">
-                  {result.summary || "Berdasarkan data tidur dan pola aktivitas Anda hari ini, berikut adalah proyeksi kondisi fisiologis Anda."}
-                </p>
-              </div>
+        {result && (
+          <div className="mt-12">
+            {/* Header Title */}
+            <div className="text-center mb-10">
+              <h2 className="text-[32px] font-bold text-on-surface tracking-tight">Hasil Prediksi Esok Hari</h2>
+              <p className="text-[15px] text-on-surface-variant mt-3 max-w-xl mx-auto leading-relaxed">
+                {result.summary || "Berdasarkan data tidur dan pola aktivitas Anda hari ini, berikut adalah proyeksi kondisi fisiologis Anda."}
+              </p>
+            </div>
 
-              {/* 2-Column Grid for Circular Scores */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+            {/* 2-Column Grid for Circular Scores */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+              
+              {/* Fitness Score Card */}
+              <div className="card relative flex flex-col items-center p-8">
+                <div className="absolute top-6 right-6">
+                  <Activity className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-[17px] font-bold text-on-surface mb-8">Predicted Fitness</h3>
                 
-                {/* Fitness Score Card */}
-                <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-8 relative flex flex-col items-center">
-                  <div className="absolute top-6 right-6">
-                    <Activity className="w-8 h-8 text-indigo-400/20" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-200 mb-8">Predicted Fitness</h3>
-                  
-                  <CircularProgress score={result.fitness_score} colorClass={getScoreColorClass(result.fitness_score)} />
-                  
-                  <div className="mt-8 px-5 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full flex items-center gap-2 text-sm font-bold">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>{result.overall_level || 'High Capacity'}</span>
-                  </div>
+                <CircularProgress score={result.fitness_score} colorClass={getScoreColorClass(result.fitness_score)} />
+                
+                <div className="mt-8 px-5 py-2 bg-primary-container text-on-primary-container rounded-full flex items-center gap-2 label-sm">
+                  <TrendingUp className="w-4 h-4 stroke-[2px]" />
+                  <span>{result.overall_level || 'High Capacity'}</span>
                 </div>
-
-                {/* Wellbeing Index Card */}
-                <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-8 relative flex flex-col items-center">
-                  <div className="absolute top-6 right-6">
-                    <Heart className="w-8 h-8 text-violet-400/20" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-200 mb-8">Predicted Wellbeing</h3>
-                  
-                  <CircularProgress score={result.wellbeing_index} colorClass={getScoreColorClass(result.wellbeing_index)} />
-                  
-                  <div className="mt-8 px-5 py-2 bg-violet-500/10 text-violet-400 border border-violet-500/20 rounded-full flex items-center gap-2 text-sm font-bold">
-                    <Zap className="w-4 h-4" />
-                    <span>{result.sleep_risk_label || 'Peak State'}</span>
-                  </div>
-                </div>
-
               </div>
 
-              {/* AI Recommendations Card */}
-              {result.recommendations && result.recommendations.length > 0 && (
-                <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-8 mb-8">
-                  <h3 className="text-xl font-bold text-slate-200 mb-8 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-violet-400" />
-                    </div>
-                    <span>Rekomendasi AI</span>
-                  </h3>
+              {/* Wellbeing Index Card */}
+              <div className="card relative flex flex-col items-center p-8">
+                <div className="absolute top-6 right-6">
+                  <Heart className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-[17px] font-bold text-on-surface mb-8">Predicted Wellbeing</h3>
+                
+                <CircularProgress score={result.wellbeing_index} colorClass={getScoreColorClass(result.wellbeing_index)} />
+                
+                <div className="mt-8 px-5 py-2 bg-primary-container text-on-primary-container rounded-full flex items-center gap-2 label-sm">
+                  <Zap className="w-4 h-4 stroke-[2px]" />
+                  <span>{result.sleep_risk_label || 'Peak State'}</span>
+                </div>
+              </div>
 
-                  <div className="space-y-6">
-                    {result.recommendations.map((rec, idx) => {
-                      // Determine icon based on message content or priority
-                      let IconComponent = Info;
-                      let iconColor = 'text-slate-400';
-                      let bgColor = 'bg-slate-800/50';
+            </div>
 
-                      if (rec.message.toLowerCase().includes('tidur') || rec.message.toLowerCase().includes('sleep')) {
-                        IconComponent = Moon;
-                        iconColor = 'text-indigo-400';
-                        bgColor = 'bg-indigo-500/10';
-                      } else if (rec.message.toLowerCase().includes('air') || rec.message.toLowerCase().includes('minum')) {
-                        IconComponent = Droplet;
-                        iconColor = 'text-blue-400';
-                        bgColor = 'bg-blue-500/10';
-                      } else if (rec.message.toLowerCase().includes('waktu') || rec.message.toLowerCase().includes('jam')) {
-                        IconComponent = Clock;
-                        iconColor = 'text-emerald-400';
-                        bgColor = 'bg-emerald-500/10';
-                      } else if (rec.priority === 'high') {
-                        IconComponent = AlertTriangle;
-                        iconColor = 'text-red-400';
-                        bgColor = 'bg-red-500/10';
-                      }
+            {/* Alert for Accuracy Info */}
+            <div className="mb-8 p-4 rounded-md bg-surface-container-low border border-outline-variant flex items-start gap-3">
+              <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-[14px] text-on-surface-variant leading-relaxed">
+                <strong className="text-on-surface">Catatan Akurasi:</strong> Prediksi <strong>Wellbeing</strong> AI kami memiliki tingkat akurasi tinggi karena berhubungan langsung dengan kualitas tidur Anda. Sementara itu, prediksi <strong>Fitness Score</strong> lebih bersifat perkiraan, karena aktivitas fisik Anda esok hari juga sangat dipengaruhi oleh faktor luar (seperti kesibukan, cuaca, atau motivasi) yang tidak tercatat dalam pola tidur.
+              </p>
+            </div>
 
-                      return (
-                        <div key={idx} className="flex items-center gap-5 p-2">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 border border-white/5 shadow-inner ${bgColor}`}>
-                            <IconComponent className={`w-5 h-5 ${iconColor}`} />
-                          </div>
-                          <div className="flex flex-col justify-center">
-                            <p className={rec.action ? "text-sm font-medium text-slate-400" : "text-base font-medium text-slate-200"}>{rec.message}</p>
-                            {rec.action && <p className="text-base font-bold text-slate-200 mt-0.5">{rec.action}</p>}
-                          </div>
+            {/* AI Recommendations Card */}
+            {result.recommendations && result.recommendations.length > 0 && (
+              <div className="card mb-8 p-8">
+                <h3 className="text-[22px] font-bold text-on-surface mb-8 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-md bg-primary-container flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-on-primary-container stroke-[2px]" />
+                  </div>
+                  <span>Rekomendasi AI</span>
+                </h3>
+
+                <div className="space-y-6">
+                  {result.recommendations.map((rec, idx) => {
+                    let IconComponent = Info;
+                    let iconColor = 'text-primary';
+                    let bgColor = 'bg-primary-container';
+
+                    if (rec.message.toLowerCase().includes('tidur') || rec.message.toLowerCase().includes('sleep')) {
+                      IconComponent = Moon;
+                    } else if (rec.message.toLowerCase().includes('air') || rec.message.toLowerCase().includes('minum')) {
+                      IconComponent = Droplet;
+                    } else if (rec.message.toLowerCase().includes('waktu') || rec.message.toLowerCase().includes('jam')) {
+                      IconComponent = Clock;
+                    } else if (rec.priority === 'high') {
+                      IconComponent = AlertTriangle;
+                      iconColor = 'text-error';
+                      bgColor = 'bg-error-container';
+                    }
+
+                    return (
+                      <div key={idx} className="flex items-center gap-5 p-2">
+                        <div className={`w-12 h-12 rounded-md flex items-center justify-center flex-shrink-0 ${bgColor}`}>
+                          <IconComponent className={`w-6 h-6 ${iconColor} stroke-[2px]`} />
                         </div>
-                      );
-                    })}
-                  </div>
+                        <div className="flex flex-col justify-center">
+                          <p className={`text-[15px] ${rec.action ? "font-semibold text-on-surface-variant" : "font-bold text-on-surface"}`}>{rec.message}</p>
+                          {rec.action && <p className="text-[17px] font-bold text-on-surface mt-0.5">{rec.action}</p>}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-
-              {/* Centered CTA Button */}
-              <div className="flex justify-center mt-10">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    to={`/chat?id=${result.id}`}
-                    className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full shadow-lg shadow-indigo-600/25 border border-indigo-500 flex items-center gap-2.5 transition-all"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Diskusikan Hasil dengan AI</span>
-                  </Link>
-                </motion.div>
               </div>
+            )}
 
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {/* Centered CTA Button */}
+            <div className="flex justify-center mt-10">
+              <Link
+                to={`/chat?id=${result.id}`}
+                className="btn-primary px-8 py-3.5 text-[17px] rounded-full"
+              >
+                <MessageSquare className="w-5 h-5 stroke-[2px]" />
+                <span>Diskusikan Hasil dengan AI</span>
+              </Link>
+            </div>
+
+          </div>
+        )}
       </div>
     </div>
   );

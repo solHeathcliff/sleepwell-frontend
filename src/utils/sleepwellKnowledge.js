@@ -449,6 +449,14 @@ export function findLocalAnswer(query) {
     return { matched: false };
   }
 
+  // Jika pengguna menanyakan tentang dirinya sendiri (personal query),
+  // lewati pengecekan lokal agar diproses oleh Groq AI menggunakan konteks.
+  const personalKeywords = ['saya', 'aku', 'umur', 'skorku', 'skor saya', 'hari ini', 'besok', 'data saya', 'berat badan'];
+  const normalizedQuery = normalize(query);
+  if (personalKeywords.some(pk => normalizedQuery.includes(pk))) {
+    return { matched: false };
+  }
+
   let bestMatch = null;
   let bestScore = 0;
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import StarsBackground from './components/StarsBackground';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -34,10 +33,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="relative min-h-screen text-slate-100 font-sans selection:bg-violet-500/30 selection:text-violet-200">
-          {/* Animated Twinkling Background */}
-          <StarsBackground />
-
+        <div className="relative min-h-screen text-on-surface font-sans selection:bg-primary-container selection:text-on-primary-container">
           {/* Main App Container */}
           <div className="relative z-10 flex flex-col min-h-screen">
             <Routes>
