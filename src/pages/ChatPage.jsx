@@ -243,7 +243,7 @@ const ChatPage = () => {
         {msg.source === 'groq_llm' && (
           <div className="flex items-center gap-1.5 mb-2.5 pb-2 border-b border-outline-variant/50">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="label-sm text-primary uppercase tracking-wider">Groq AI (Llama 3.3 70B)</span>
+            <span className="label-sm text-primary uppercase tracking-wider">SleepWell AI</span>
           </div>
         )}
         <span dangerouslySetInnerHTML={{ __html: html }} />
