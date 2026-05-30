@@ -6,7 +6,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, Brain, User, LogOut, Sparkles, Plus, 
-  MessageSquare, Calendar, Award, ShieldAlert, Zap, Loader2 
+  MessageSquare, Calendar, Award, ShieldAlert, Zap, Loader2, Moon 
 } from 'lucide-react';
 import { API_BASE } from '../context/AuthContext';
 
